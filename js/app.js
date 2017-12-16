@@ -118,10 +118,32 @@ $(document).ready(function() {
 		},
 		this.reset = function() {
 			if (asteroids.length < maxAsteroids) {
-				this.x = Math.floor(Math.random() * gameWidth);
-				this.y = Math.floor(Math.random() * gameHeight);
-				this.xSpeed = Math.floor(Math.random() * 6) - 3;
-				this.ySpeed = Math.floor(Math.random() * 6) - 3;
+				switch (Math.floor(Math.random() * 4)) {
+					case 0:
+						this.x = 1;
+						this.y = Math.floor(Math.random() * gameHeight);
+						this.xSpeed = Math.floor(Math.random() * 3);
+						this.ySpeed = Math.floor(Math.random() * 6) - 3;
+						break;
+					case 1:
+						this.x = Math.floor(Math.random() * gameWidth);
+						this.y = gameHeight - 1;
+						this.xSpeed = Math.floor(Math.random() * 6) - 3;
+						this.ySpeed = Math.floor(Math.random() * 3);
+						break;
+					case 2:
+						this.x = gameHeight - 1;
+						this.y = Math.floor(Math.random() * gameHeight);
+						this.xSpeed = Math.floor(Math.random() * 3) - 3;
+						this.ySpeed = Math.floor(Math.random() * 6) - 3;
+						break;
+					case 3:
+						this.x = Math.floor(Math.random() * gameWidth);
+						this.y = 1;
+						this.xSpeed = Math.floor(Math.random() * 6) - 3;
+						this.ySpeed = Math.floor(Math.random() * 6) - 3;
+						break;
+				}
 				this.height = 50;
 				this.width = 50;
 				this.collided = false;
