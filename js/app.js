@@ -262,9 +262,19 @@ $(document).ready(function() {
 		gameArea.drawText("Press E to play!", gameWidth/2, (gameHeight/2) + 20);
 	}
 
+	function endScreen() {
+		gameArea.clear();
+		gameArea.drawText("Game Over!", gameWidth/2 - 100, gameHeight/2, 46);
+		gameArea.drawText("Score: " + player.score, gameWidth/2 - 50, gameHeight/2 + 40, 24);
+	}
+
 	function updateGameArea() {
 		if (!playing) {
-			startScreen();
+			if (player.lives < 0) {
+				endScreen();
+			} else {
+				startScreen();
+			}
 		} else {
 			gameArea.clear();
 			checkKeys();
@@ -288,7 +298,7 @@ $(document).ready(function() {
 					}
 				}
 				if (collission(player.x, player.y, player.width, player.height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
-					if (asteroids[i].collided === false && player.lives > 0) {
+					if (asteroids[i].collided === false && player.lives > -1) {
 						player.lives --;
 					}
 					asteroids[i].split();
@@ -301,6 +311,9 @@ $(document).ready(function() {
 				}
 				asteroids[i].move();
 				asteroids[i].draw();
+			}
+			if (player.lives < 0) {
+				playing = false;
 			}
 		}
 	}
