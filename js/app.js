@@ -201,7 +201,6 @@ $(document).ready(function() {
 		for (var i = 0; i < asteroidNum; i++) {
 			asteroids[i] = new asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
 		}
-		console.log(asteroids);
 	}
 
 	function collission(x1,y1,w1,h1,x2,y2,w2,h2) {
