@@ -1,8 +1,5 @@
 $(document).ready(function() {
 
-	var gameHeight = 700;
-	var gameWidth = 700;
-
 	const gameArea = {
 		canvas : document.createElement("canvas"),
 		start : function () {
@@ -30,6 +27,7 @@ $(document).ready(function() {
 		drawText : function (theString, x, y, size = 16) {
 			//Draw function for text
 			this.context.save();
+			this.context.fillStyle = "white";
 			this.context.font = size + "px Verdana";
 			this.context.fillText(theString, x, y);
 			this.context.restore();
@@ -37,17 +35,27 @@ $(document).ready(function() {
 		drawImg : function (width, height, x, y, image, rotation = 0) {
 			//Draw an image with the given parameters
 			this.context.save();
-			this.context.drawImage(image, x, y, width, height);
+			if (rotation !== 0) {
+				this.context.translate(x +(width/2),y +(height/2));
+				this.context.rotate(rotation);
+				this.context.drawImage(image, -width/2, -height/2, width, height);
+			} else {
+				this.context.drawImage(image, x, y, width, height);
+			}
 			this.context.restore();
 		}
 	};
-	//87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 80 = pause
-	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 80: false};
+	var gameHeight = 700;
+	var gameWidth = 700;
+	//87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 80 = pause
+	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 80: false};
 	var asteroids = [];
+	var bullets = [];
 	var asteroidImg;
 	var asteroidNum = 7;
 	var paused = false;
 	var maxAsteroids = 10;
+	var maxBullets = 3;
 	
 	$(document).keydown(function(e) {
 		if (e.keyCode in keyMap) {
@@ -65,11 +73,12 @@ $(document).ready(function() {
 	});
 
 	var player = {
-		x: 50,
-		y: 50,
+		x: gameWidth / 2,
+		y: gameHeight / 2,
 		height: 50,
 		width: 50,
-		speed: 2,
+		speed: 4,
+		maxSpeed: 3,
 		rotation: 0,
 		img: [],
 		lives: 2,
@@ -78,6 +87,9 @@ $(document).ready(function() {
 		},
 		init: function() {
 			this.img.src = "assets/player.png";
+		},
+		fire: function() {
+			bullets.push(new bullet(this.x,this.y + (this.height/2),this.rotation));
 		}
 	}
 
@@ -95,6 +107,9 @@ $(document).ready(function() {
 		this.move = function() {
 			if (this.x < 0 || this.x > gameWidth || this.y < 0 || this.y > gameHeight) {
 				this.reset();
+			} else if (this.xSpeed === 0 && this.ySpeed === 0){
+				this.xSpeed = Math.floor(Math.random() * 6) - 3;
+				this.ySpeed = Math.floor(Math.random() * 6) - 3;
 			} else {
 				this.x += this.xSpeed;
 				this.y += this.ySpeed;
@@ -115,13 +130,38 @@ $(document).ready(function() {
 		},
 		this.split = function() {
 			if (!this.collided) {
-				asteroids.push(new asteroid(this.x, this.y, this.xSpeed, this.ySpeed, this.height / 2, this.width /2, true));
+				asteroids.push(new asteroid(this.x, this.y, -this.xSpeed, -this.ySpeed, this.height / 2, this.width /2, true));
 				this.height /= 2;
 				this.width /= 2;
 			}
 		},
 		this.die = function() {
 			asteroids.splice(asteroids.indexOf(this),1);
+		}
+	}
+
+	function bullet(x, y, rotation) {
+		//Add an amount to x and y so the bullet doesn't hit the shooter
+		this.x = x + (Math.cos(rotation));
+		this.y = y + (Math.sin(rotation));
+		this.size = 5;
+		this.speed = 6;
+		this.rotation = rotation;
+		
+		this.move = function() {
+			//Keep bullet going at the same speed on a diagonal path
+			this.x -= this.speed * Math.cos(this.rotation);
+			this.y -= this.speed * Math.sin(this.rotation);
+			if (this.x > gameWidth || this.x < 0 || this.y > gameHeight || this.y < 0) {
+				this.die();
+			}
+		},
+		this.draw = function() {
+			gameArea.draw(this.size,this.size,this.x,this.y,"red",this.rotation);
+		},
+		this.die = function() {
+			//Remove from bullets array
+			bullets.splice(bullets.indexOf(this),1);
 		}
 	}
 
@@ -157,30 +197,47 @@ $(document).ready(function() {
 	function checkKeys() {
 		//up
 		if (keyMap[87] || keyMap[38]) {
-			player.y -= player.speed;
+			player.x -= player.speed * Math.cos(player.rotation);
+			player.y -= player.speed * Math.sin(player.rotation);
 		}
 		//Right
 		if (keyMap[68] || keyMap[39]) {
-			player.x += player.speed;
-			//player.rotation += 0.1;
+			player.rotation += 0.1;
 		}
 		//Left
 		if (keyMap[65] || keyMap[40]) {
-			player.x -= player.speed;
-			//player.rotation -= 0.1;
+			player.rotation -= 0.1;
 		}
 		//Down
 		if (keyMap[83] || keyMap[37]) {
-			player.y += player.speed;
+			player.x += player.speed * Math.cos(player.rotation);
+			player.y += player.speed * Math.sin(player.rotation);
+		}
+		if (keyMap[71] && bullets.length < maxBullets) {
+			player.fire();
+		}
+	}
+
+	function drawLives() {
+		gameArea.drawText("Lives: ", 10, 20);
+		for (var i = 0; i < player.lives; i++) {
+			gameArea.drawText("*", 60 + (10*i), 20);
 		}
 	}
 
 	function updateGameArea() {
 		gameArea.clear();
 		checkKeys();
+		drawLives();
 		player.draw();
 		if (asteroids.length > maxAsteroids) {
 			asteroids.splice(0,maxAsteroids - asteroids.length);
+		}
+		for (var i = 0; i < bullets.length; i++) {
+			bullets[i].move();
+			if (bullets[i]) {
+				bullets[i].draw();
+			}
 		}
 		for (var i = 0; i < asteroids.length; i++) {
 			if (collission(player.x, player.y, player.width, player.height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
@@ -189,6 +246,11 @@ $(document).ready(function() {
 				}
 				asteroids[i].split();
 				asteroids[i].collided = true;
+			} else if (asteroids[i].collided){
+				asteroids[i].collided = false;
+			} else if (asteroids[i].height < 10) {
+				asteroids[i].die();
+				continue;
 			}
 			asteroids[i].move();
 			asteroids[i].draw();
