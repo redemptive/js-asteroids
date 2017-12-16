@@ -77,6 +77,7 @@ $(document).ready(function() {
 		y: gameHeight / 2,
 		height: 50,
 		width: 50,
+		score: 0,
 		speed: 4,
 		maxSpeed: 3,
 		rotation: 0,
@@ -218,17 +219,18 @@ $(document).ready(function() {
 		}
 	}
 
-	function drawLives() {
-		gameArea.drawText("Lives: ", 10, 20);
+	function drawHud() {
+		gameArea.drawText("Score: " + player.score, 10, 20);
+		gameArea.drawText("Lives: ", 10, 40);
 		for (var i = 0; i < player.lives; i++) {
-			gameArea.drawText("*", 60 + (10*i), 20);
+			gameArea.drawText("*", 60 + (10*i), 40);
 		}
 	}
 
 	function updateGameArea() {
 		gameArea.clear();
 		checkKeys();
-		drawLives();
+		drawHud();
 		player.draw();
 		if (asteroids.length > maxAsteroids) {
 			asteroids.splice(0,maxAsteroids - asteroids.length);
@@ -240,6 +242,13 @@ $(document).ready(function() {
 			}
 		}
 		for (var i = 0; i < asteroids.length; i++) {
+			for (var j = 0; j < bullets.length; j++) {
+				if (collission(bullets[j].x, bullets[j].y, bullets[j].size, bullets[j].size, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
+					player.score++;
+					bullets[j].die();
+					asteroids[i].split();
+				}
+			}
 			if (collission(player.x, player.y, player.width, player.height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
 				if (asteroids[i].collided === false && player.lives > 0) {
 					player.lives --;
