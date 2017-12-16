@@ -47,8 +47,8 @@ $(document).ready(function() {
 	};
 	var gameHeight = 700;
 	var gameWidth = 700;
-	//87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 80 = pause
-	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 80: false};
+	//87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 69 = e 80 = pause
+	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69:false, 80: false};
 	var asteroids = [];
 	var bullets = [];
 	var asteroidImg;
@@ -56,6 +56,8 @@ $(document).ready(function() {
 	var paused = false;
 	var maxAsteroids = 10;
 	var maxBullets = 3;
+	var playing = false;
+	var splashImg;
 	
 	$(document).keydown(function(e) {
 		if (e.keyCode in keyMap) {
@@ -64,6 +66,9 @@ $(document).ready(function() {
 				paused = false;
 			} else if (!paused && e.keyCode == 80){
 				paused = true;
+			}
+			if (!playing && e.keyCode == 69) {
+				playing = true;
 			}
 		}
 	}).keyup(function(e) {
@@ -191,13 +196,15 @@ $(document).ready(function() {
 	function initGame() {
 		player.init();
 		player.img[0] = new Image();
-		player.img[0].src = "assets/playerDam2.png"
+		player.img[0].src = "assets/playerDam2.png";
 		player.img[1] = new Image();
-		player.img[1].src = "assets/playerDam1.png"
+		player.img[1].src = "assets/playerDam1.png";
 		player.img[2] = new Image();
-		player.img[2].src = "assets/player.png"
+		player.img[2].src = "assets/player.png";
 		asteroidImg = new Image();
 		asteroidImg.src = "assets/asteroid.png";
+		splashImg = new Image();
+		splashImg.src = "assets/splash.png";
 		for (var i = 0; i < asteroidNum; i++) {
 			asteroids[i] = new asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
 		}
@@ -235,6 +242,7 @@ $(document).ready(function() {
 			player.x += player.speed * Math.cos(player.rotation);
 			player.y += player.speed * Math.sin(player.rotation);
 		}
+		//G
 		if (keyMap[71] && bullets.length < maxBullets) {
 			player.fire();
 		}
@@ -248,42 +256,52 @@ $(document).ready(function() {
 		}
 	}
 
-	function updateGameArea() {
+	function startScreen() {
 		gameArea.clear();
-		checkKeys();
-		drawHud();
-		player.draw();
-		if (asteroids.length > maxAsteroids) {
-			asteroids.splice(0,maxAsteroids - asteroids.length);
-		}
-		for (var i = 0; i < bullets.length; i++) {
-			bullets[i].move();
-			if (bullets[i]) {
-				bullets[i].draw();
+		gameArea.drawImg(gameWidth - 20,gameHeight,0, 0, splashImg);
+		gameArea.drawText("Press E to play!", gameWidth/2, (gameHeight/2) + 20);
+	}
+
+	function updateGameArea() {
+		if (!playing) {
+			startScreen();
+		} else {
+			gameArea.clear();
+			checkKeys();
+			drawHud();
+			player.draw();
+			if (asteroids.length > maxAsteroids) {
+				asteroids.splice(0,maxAsteroids - asteroids.length);
 			}
-		}
-		for (var i = 0; i < asteroids.length; i++) {
-			for (var j = 0; j < bullets.length; j++) {
-				if (collission(bullets[j].x, bullets[j].y, bullets[j].size, bullets[j].size, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
-					player.score++;
-					bullets[j].die();
+			for (var i = 0; i < bullets.length; i++) {
+				bullets[i].move();
+				if (bullets[i]) {
+					bullets[i].draw();
+				}
+			}
+			for (var i = 0; i < asteroids.length; i++) {
+				for (var j = 0; j < bullets.length; j++) {
+					if (collission(bullets[j].x, bullets[j].y, bullets[j].size, bullets[j].size, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
+						player.score++;
+						bullets[j].die();
+						asteroids[i].split();
+					}
+				}
+				if (collission(player.x, player.y, player.width, player.height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
+					if (asteroids[i].collided === false && player.lives > 0) {
+						player.lives --;
+					}
 					asteroids[i].split();
+					asteroids[i].collided = true;
+				} else if (asteroids[i].collided){
+					asteroids[i].collided = false;
+				} else if (asteroids[i].height < 10) {
+					asteroids[i].die();
+					continue;
 				}
+				asteroids[i].move();
+				asteroids[i].draw();
 			}
-			if (collission(player.x, player.y, player.width, player.height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
-				if (asteroids[i].collided === false && player.lives > 0) {
-					player.lives --;
-				}
-				asteroids[i].split();
-				asteroids[i].collided = true;
-			} else if (asteroids[i].collided){
-				asteroids[i].collided = false;
-			} else if (asteroids[i].height < 10) {
-				asteroids[i].die();
-				continue;
-			}
-			asteroids[i].move();
-			asteroids[i].draw();
 		}
 	}
 
