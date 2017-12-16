@@ -196,7 +196,7 @@ $(document).ready(function() {
 
 	function checkKeys() {
 		//up
-		if (keyMap[87] || keyMap[38]) {
+		if ((keyMap[87] || keyMap[38]) && player.x - player.speed * Math.cos(player.rotation) > 0 && player.x - player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y - player.speed * Math.sin(player.rotation) > 0 && player.y - player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
 			player.x -= player.speed * Math.cos(player.rotation);
 			player.y -= player.speed * Math.sin(player.rotation);
 		}
@@ -209,7 +209,7 @@ $(document).ready(function() {
 			player.rotation -= 0.1;
 		}
 		//Down
-		if (keyMap[83] || keyMap[37]) {
+		if ((keyMap[83] || keyMap[37]) && player.x + player.speed * Math.cos(player.rotation) > 0 && player.x + player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y + player.speed * Math.sin(player.rotation) > 0 && player.y + player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
 			player.x += player.speed * Math.cos(player.rotation);
 			player.y += player.speed * Math.sin(player.rotation);
 		}
