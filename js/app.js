@@ -59,6 +59,7 @@ $(document).ready(function() {
 	var playing = false;
 	var splashImg;
 	
+	//Handle keys, keyMap[key] will be true it the button is currently pressed, and false otherwise
 	$(document).keydown(function(e) {
 		if (e.keyCode in keyMap) {
 			keyMap[e.keyCode] = true;
@@ -74,6 +75,9 @@ $(document).ready(function() {
 	}).keyup(function(e) {
 		if (e.keyCode in keyMap) {
 			keyMap[e.keyCode] = false;
+			if (player.fired) {
+				player.fired = false;
+			}
 		}
 	});
 
@@ -88,6 +92,7 @@ $(document).ready(function() {
 		rotation: 0,
 		img: [],
 		lives: 2,
+		fired: false,
 		draw: function() {
 			gameArea.drawImg(this.width, this.height, this.x, this.y, this.img[this.lives], this.rotation);
 		},
@@ -95,7 +100,10 @@ $(document).ready(function() {
 			this.img.src = "assets/player.png";
 		},
 		fire: function() {
-			bullets.push(new bullet(this.x,this.y + (this.height/2),this.rotation));
+			if (!this.fired) {
+				bullets.push(new bullet(this.x,this.y + (this.height/2),this.rotation));
+				this.fired = true;
+			}
 		}
 	}
 
@@ -314,7 +322,7 @@ $(document).ready(function() {
 				} else if (asteroids[i].collided){
 					asteroids[i].collided = false;
 				} else if (asteroids[i].height < 10) {
-					//If asteroid is too small delete it and skip moving and drawing itt
+					//If asteroid is too small delete it and skip moving and drawing it
 					asteroids[i].die();
 					continue;
 				}
