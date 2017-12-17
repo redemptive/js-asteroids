@@ -276,7 +276,6 @@ $(document).ready(function() {
 				startScreen();
 			}
 		} else {
-
 			gameArea.clear();
 			checkKeys();
 			drawHud();
