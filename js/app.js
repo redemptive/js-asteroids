@@ -4,8 +4,8 @@ $(document).ready(function() {
 		canvas : document.createElement("canvas"),
 		start : function () {
 			//Initiate the game area
-			this.canvas.width = gameHeight;
-			this.canvas.height = gameWidth;
+			this.canvas.width = gameWidth;
+			this.canvas.height = gameHeight;
 			this.context = this.canvas.getContext("2d");
 			document.body.insertBefore(this.canvas,document.body.childNodes[0]);
 			this.interval = setInterval(updateGameArea, 20);
@@ -45,8 +45,8 @@ $(document).ready(function() {
 			this.context.restore();
 		}
 	};
-	var gameHeight = 700;
-	var gameWidth = 700;
+	var gameHeight = $(window).height() - 20;
+	var gameWidth = $(window).width() - 20;
 	//87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 69 = e 80 = pause
 	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69:false, 80: false};
 	var asteroids = [];
@@ -205,7 +205,7 @@ $(document).ready(function() {
 		asteroidImg.src = "assets/asteroid.png";
 		splashImg = new Image();
 		splashImg.src = "assets/splash.png";
-		for (var i = 0; i < asteroidNum; i++) {
+		for (var i = 0; i < maxAsteroids; i++) {
 			asteroids[i] = new asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
 		}
 	}
@@ -259,7 +259,7 @@ $(document).ready(function() {
 	function startScreen() {
 		gameArea.clear();
 		gameArea.drawImg(gameWidth - 20,gameHeight,0, 0, splashImg);
-		gameArea.drawText("Press E to play!", gameWidth/2, (gameHeight/2) + 20);
+		gameArea.drawText("Press E to play!", gameWidth/2 - 40, (gameHeight/2) + 60);
 	}
 
 	function endScreen() {
@@ -276,6 +276,7 @@ $(document).ready(function() {
 				startScreen();
 			}
 		} else {
+
 			gameArea.clear();
 			checkKeys();
 			drawHud();
