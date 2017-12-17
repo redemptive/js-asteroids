@@ -67,7 +67,7 @@ $(document).ready(function() {
 			} else if (!paused && e.keyCode == 80){
 				paused = true;
 			}
-			if (!playing && e.keyCode == 69) {
+			if (!playing && e.keyCode == 69 && player.lives > 0) {
 				playing = true;
 			}
 		}
@@ -122,6 +122,7 @@ $(document).ready(function() {
 			}
 		},
 		this.reset = function() {
+			//Make the asteroid come from a random side of the screen
 			if (asteroids.length < maxAsteroids) {
 				switch (Math.floor(Math.random() * 4)) {
 					case 0:
@@ -177,9 +178,10 @@ $(document).ready(function() {
 		this.rotation = rotation;
 		
 		this.move = function() {
-			//Keep bullet going at the same speed on a diagonal path
+			//Keep bullet going at the same speed on a diagonal path with maths
 			this.x -= this.speed * Math.cos(this.rotation);
 			this.y -= this.speed * Math.sin(this.rotation);
+			//remove from array if out of bounds
 			if (this.x > gameWidth || this.x < 0 || this.y > gameHeight || this.y < 0) {
 				this.die();
 			}
@@ -195,6 +197,7 @@ $(document).ready(function() {
 
 	function initGame() {
 		player.init();
+		//Grab all sprites required
 		player.img[0] = new Image();
 		player.img[0].src = "assets/playerDam2.png";
 		player.img[1] = new Image();
@@ -205,6 +208,7 @@ $(document).ready(function() {
 		asteroidImg.src = "assets/asteroid.png";
 		splashImg = new Image();
 		splashImg.src = "assets/splash.png";
+		//Populate the asteroids array
 		for (var i = 0; i < maxAsteroids; i++) {
 			asteroids[i] = new asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
 		}
@@ -270,6 +274,7 @@ $(document).ready(function() {
 
 	function updateGameArea() {
 		if (!playing) {
+			//Display the start screen or end screen depending on how many lives the player has
 			if (player.lives < 0) {
 				endScreen();
 			} else {
@@ -283,6 +288,7 @@ $(document).ready(function() {
 			if (asteroids.length > maxAsteroids) {
 				asteroids.splice(0,maxAsteroids - asteroids.length);
 			}
+			//Move and draw all the bullets
 			for (var i = 0; i < bullets.length; i++) {
 				bullets[i].move();
 				if (bullets[i]) {
@@ -291,12 +297,14 @@ $(document).ready(function() {
 			}
 			for (var i = 0; i < asteroids.length; i++) {
 				for (var j = 0; j < bullets.length; j++) {
+					//Check collissions between all bullets and all asteroids
 					if (collission(bullets[j].x, bullets[j].y, bullets[j].size, bullets[j].size, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
 						player.score++;
 						bullets[j].die();
 						asteroids[i].split();
 					}
 				}
+				//Check collission between the player and all asteroids
 				if (collission(player.x, player.y, player.width, player.height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
 					if (asteroids[i].collided === false && player.lives > -1) {
 						player.lives --;
@@ -306,12 +314,14 @@ $(document).ready(function() {
 				} else if (asteroids[i].collided){
 					asteroids[i].collided = false;
 				} else if (asteroids[i].height < 10) {
+					//If asteroid is too small delete it and skip moving and drawing itt
 					asteroids[i].die();
 					continue;
 				}
 				asteroids[i].move();
 				asteroids[i].draw();
 			}
+			//End the game if the player has no lives left
 			if (player.lives < 0) {
 				playing = false;
 			}
