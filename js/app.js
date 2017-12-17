@@ -51,7 +51,7 @@ $(document).ready(function() {
 	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69:false, 80: false};
 	var asteroids = [];
 	var bullets = [];
-	var asteroidImg;
+	var asteroidImgs = [];
 	var asteroidNum = 7;
 	var paused = false;
 	var maxAsteroids = 10;
@@ -115,8 +115,9 @@ $(document).ready(function() {
 		this.width = width;
 		this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
+		this.image = Math.floor(Math.random() * 3);
 		this.draw = function() {
-			gameArea.drawImg(this.width, this.height, this.x, this.y, asteroidImg);
+			gameArea.drawImg(this.width, this.height, this.x, this.y, asteroidImgs[this.image]);
 		},
 		this.move = function() {
 			if (this.x < 0 || this.x > gameWidth || this.y < 0 || this.y > gameHeight) {
@@ -212,8 +213,12 @@ $(document).ready(function() {
 		player.img[1].src = "assets/playerDam1.png";
 		player.img[2] = new Image();
 		player.img[2].src = "assets/player.png";
-		asteroidImg = new Image();
-		asteroidImg.src = "assets/asteroid.png";
+		asteroidImgs[0] = new Image();
+		asteroidImgs[0].src = "assets/asteroid.png";
+		asteroidImgs[1] = new Image();
+		asteroidImgs[1].src = "assets/asteroid1.png";
+		asteroidImgs[2] = new Image();
+		asteroidImgs[2].src = "assets/asteroid2.png";
 		splashImg = new Image();
 		splashImg.src = "assets/splash.png";
 		//Populate the asteroids array
