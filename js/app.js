@@ -28,7 +28,7 @@ $(document).ready(function() {
 			//Draw function for text
 			this.context.save();
 			this.context.fillStyle = "white";
-			this.context.font = size + "px Verdana";
+			this.context.font = size + "px Courier New";
 			this.context.fillText(theString, x, y);
 			this.context.restore();
 		},
@@ -269,7 +269,7 @@ $(document).ready(function() {
 		gameArea.drawText("Score: " + player.score, 10, 20);
 		gameArea.drawText("Lives: ", 10, 40);
 		for (var i = 0; i < player.lives; i++) {
-			gameArea.drawText("*", 60 + (10*i), 40);
+			gameArea.drawText("*", 80 + (10*i), 40);
 		}
 	}
 
