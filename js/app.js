@@ -55,7 +55,7 @@ $(document).ready(function() {
 	var asteroidNum = 7;
 	var paused = false;
 	var maxAsteroids = 10;
-	var maxBullets = 3;
+	var maxBullets = 5;
 	var playing = false;
 	var splashImg;
 	
