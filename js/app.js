@@ -147,7 +147,7 @@ $(document).ready(function() {
 						this.ySpeed = Math.floor(Math.random() * 3);
 						break;
 					case 2:
-						this.x = gameHeight - 1;
+						this.x = gameWidth - 1;
 						this.y = Math.floor(Math.random() * gameHeight);
 						this.xSpeed = Math.floor(Math.random() * 3) - 3;
 						this.ySpeed = Math.floor(Math.random() * 6) - 3;
@@ -238,6 +238,10 @@ $(document).ready(function() {
 		} else {
 			return false;
 		}
+	}
+
+	function randBounds(min, max) {
+		return Math.floor(Math.random() * (max + min + 1)) - min;
 	}
 
 	function checkKeys() {
