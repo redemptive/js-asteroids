@@ -6,7 +6,7 @@ $(document).ready(() => {
       this.canvas.height = gameHeight;
       this.context = this.canvas.getContext('2d');
       document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-      this.interval = setInterval(updateGameArea, 20);
+      this.interval = setInterval(this.update, 20);
     }
 
     clear() {
@@ -46,10 +46,60 @@ $(document).ready(() => {
       }
       this.context.restore();
     }
+
+    update() {
+      if (!playing) {
+        if (player.lives < 0) {
+			  endScreen();
+        } else {
+			  startScreen();
+        }
+      } else {
+        gameArea.clear();
+        checkKeys();
+        drawHud();
+        player.draw();
+        if (asteroids.length > maxAsteroids) {
+			    asteroids.splice(0, maxAsteroids - asteroids.length);
+        }
+        for (let i = 0; i < bullets.length; i++) {
+          bullets[i].move();
+          if (bullets[i]) {
+            bullets[i].draw();
+          }
+        }
+        for (let i = 0; i < asteroids.length; i++) {
+          for (let j = 0; j < bullets.length; j++) {
+            if (bullets[j].collission(asteroids[i])) {
+              player.score++;
+              bullets[j].die();
+              asteroids[i].split();
+            }
+          }
+          if (player.collission(asteroids[i])) {
+            if (asteroids[i].collided === false && player.lives > -1) {
+              player.lives--;
+            } else if (player.lives = 0) {
+              playing = false;
+              continue;
+            }
+            asteroids[i].split();
+            asteroids[i].collided = true;
+          } else if (asteroids[i].collided) {
+            asteroids[i].collided = false;
+          } else if (asteroids[i].height < 10) {
+            asteroids[i].die();
+            continue;
+          }
+          asteroids[i].move();
+          asteroids[i].draw();
+        }
+      }
+	  }
   }
 
-  const gameHeight = $(window).height() - 20;
-  const gameWidth = $(window).width() - 20;
+  const gameHeight = $(window).height() - 40;
+  const gameWidth = $(window).width() - 40;
   const maxAsteroids = 10;
   const maxBullets = 3;
   // 87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 69 = e 80 = pause
@@ -89,18 +139,19 @@ $(document).ready(() => {
       this.width = width;
       this.height = height;
       this.rotation = rotation;
-	}
-	collission(gameObject) {
-		// Standard bounding box collission detection
-		let r1 = this.width + this.x;
-		let b1 = this.height + this.y;
-		let r2 = gameObject.width + gameObject.x;
-		let b2 = gameObject.height + gameObject.y;
-	
-		if (this.x < r2 && r1 > gameObject.x && this.y < b2 && b1 > gameObject.y) {
+    }
+
+    collission(gameObject) {
+      // Standard bounding box collission detection
+      const r1 = this.width + this.x;
+      const b1 = this.height + this.y;
+      const r2 = gameObject.width + gameObject.x;
+      const b2 = gameObject.height + gameObject.y;
+
+      if (this.x < r2 && r1 > gameObject.x && this.y < b2 && b1 > gameObject.y) {
 		  return true;
-		}
-		return false;
+      }
+      return false;
 	  }
   }
 
@@ -239,19 +290,6 @@ $(document).ready(() => {
     }
   }
 
-  function collission(x1, y1, w1, h1, x2, y2, w2, h2) {
-    // Standard bounding box collission detection
-    let r1 = w1 + x1;
-    let b1 = h1 + y1;
-    let r2 = w2 + x2;
-    let b2 = h2 + y2;
-
-    if (x1 < r2 && r1 > x2 && y1 < b2 && b1 > y2) {
-      return true;
-    }
-    return false;
-  }
-
   function checkKeys() {
     // up
     if ((keyMap[87] || keyMap[38]) && player.x - player.speed * Math.cos(player.rotation) > 0 && player.x - player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y - player.speed * Math.sin(player.rotation) > 0 && player.y - player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
@@ -295,56 +333,6 @@ $(document).ready(() => {
     gameArea.clear();
     gameArea.drawText('Game Over!', gameWidth / 2 - 100, gameHeight / 2, 46);
     gameArea.drawText(`Score: ${player.score}`, gameWidth / 2 - 50, gameHeight / 2 + 40, 24);
-  }
-
-  function updateGameArea() {
-    if (!playing) {
-      if (player.lives < 0) {
-        endScreen();
-      } else {
-        startScreen();
-      }
-    } else {
-      gameArea.clear();
-      checkKeys();
-      drawHud();
-      player.draw();
-      if (asteroids.length > maxAsteroids) {
-        asteroids.splice(0, maxAsteroids - asteroids.length);
-      }
-      for (let i = 0; i < bullets.length; i++) {
-        bullets[i].move();
-        if (bullets[i]) {
-          bullets[i].draw();
-        }
-      }
-      for (let i = 0; i < asteroids.length; i++) {
-        for (let j = 0; j < bullets.length; j++) {
-          if (bullets[j].collission(asteroids[i])) {
-            player.score++;
-            bullets[j].die();
-            asteroids[i].split();
-          }
-        }
-        if (player.collission(asteroids[i])) {
-          if (asteroids[i].collided === false && player.lives > -1) {
-            player.lives--;
-          }
-          asteroids[i].split();
-          asteroids[i].collided = true;
-        } else if (asteroids[i].collided) {
-          asteroids[i].collided = false;
-        } else if (asteroids[i].height < 10) {
-          asteroids[i].die();
-          continue;
-        }
-        asteroids[i].move();
-        asteroids[i].draw();
-      }
-      if (player.lives < 0) {
-        playing = false;
-      }
-    }
   }
 
   let gameArea = new GameArea();
