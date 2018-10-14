@@ -45,19 +45,19 @@ $(document).ready(function() {
 			this.context.restore();
 		}
 	};
-	var gameHeight = $(window).height() - 20;
-	var gameWidth = $(window).width() - 20;
+
+	const gameHeight = $(window).height() - 20;
+	const gameWidth = $(window).width() - 20;
+	const maxAsteroids = 10;
+	const maxBullets = 3;
 	//87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 69 = e 80 = pause
-	var keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69:false, 80: false};
-	var asteroids = [];
-	var bullets = [];
-	var asteroidImg;
-	var asteroidNum = 7;
-	var paused = false;
-	var maxAsteroids = 10;
-	var maxBullets = 3;
-	var playing = false;
-	var splashImg;
+	let keyMap = {87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69:false, 80: false};
+	let asteroids = [];
+	let bullets = [];
+	let asteroidImg;
+	let paused = false;
+	let playing = false;
+	let splashImg;
 	
 	$(document).keydown(function(e) {
 		if (e.keyCode in keyMap) {
@@ -99,18 +99,20 @@ $(document).ready(function() {
 		}
 	}
 
-	function asteroid(x, y, xSpeed, ySpeed, height, width, collided = false) {
-		this.x = x;
-		this.y = y;
-		this.collided = collided;
-		this.height = height;
-		this.width = width;
-		this.xSpeed = xSpeed;
-		this.ySpeed = ySpeed;
-		this.draw = function() {
+	class asteroid {
+		constructor (x, y, xSpeed, ySpeed, height, width, collided = false) {
+			this.x = x;
+			this.y = y;
+			this.collided = collided;
+			this.height = height;
+			this.width = width;
+			this.xSpeed = xSpeed;
+			this.ySpeed = ySpeed;
+		}
+		draw() {
 			gameArea.drawImg(this.width, this.height, this.x, this.y, asteroidImg);
-		},
-		this.move = function() {
+		}
+		move() {
 			if (this.x < 0 || this.x > gameWidth || this.y < 0 || this.y > gameHeight) {
 				this.reset();
 			} else if (this.xSpeed === 0 && this.ySpeed === 0){
@@ -120,8 +122,8 @@ $(document).ready(function() {
 				this.x += this.xSpeed;
 				this.y += this.ySpeed;
 			}
-		},
-		this.reset = function() {
+		}
+		reset() {
 			if (asteroids.length < maxAsteroids) {
 				switch (Math.floor(Math.random() * 4)) {
 					case 0:
@@ -155,15 +157,15 @@ $(document).ready(function() {
 			} else {
 				this.die();
 			}
-		},
-		this.split = function() {
+		}
+		split() {
 			if (!this.collided) {
 				asteroids.push(new asteroid(this.x, this.y, -this.xSpeed, -this.ySpeed, this.height / 2, this.width /2, true));
 				this.height /= 2;
 				this.width /= 2;
 			}
-		},
-		this.die = function() {
+		}
+		die() {
 			asteroids.splice(asteroids.indexOf(this),1);
 		}
 	}
