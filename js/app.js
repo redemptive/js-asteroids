@@ -78,21 +78,21 @@ $(document).ready(function() {
 	});
 
 	class GameObject {
-		constructor(x, y, width, height) {
+		constructor(x, y, width, height, rotation) {
 			this.x = x;
 			this.y = y;
 			this.width = width;
 			this.height = height;
+			this.rotation = rotation;
 		}
 	}
 
 	class Player extends GameObject {
 		constructor() {
-			super(gameWidth / 2, gameHeight / 2, 50, 50);
+			super(gameWidth / 2, gameHeight / 2, 50, 50, 0);
 			this.score = 0;
 			this.speed = 4;
 			this.maxSpeed = 3;
-			this.rotation = 0;
 			this.img = [];
 			this.lives = 2;
 			this.img[0] = new Image();
@@ -112,13 +112,13 @@ $(document).ready(function() {
 
 	class asteroid extends GameObject {
 		constructor (x, y, xSpeed, ySpeed, height, width, collided = false) {
-			super(x, y, width, height);
+			super(x, y, width, height, 0);
 			this.collided = collided;
 			this.xSpeed = xSpeed;
 			this.ySpeed = ySpeed;
 		}
 		draw() {
-			gameArea.drawImg(this.width, this.height, this.x, this.y, asteroidImg);
+			gameArea.drawImg(this.width, this.height, this.x, this.y, asteroidImg, this.rotation);
 		}
 		move() {
 			if (this.x < 0 || this.x > gameWidth || this.y < 0 || this.y > gameHeight) {
@@ -181,9 +181,8 @@ $(document).ready(function() {
 	class bullet extends GameObject{
 		constructor (x, y, rotation) {
 			//Add an amount to x and y so the bullet doesn't hit the shooter
-			super(x + (Math.cos(rotation)), y + (Math.sin(rotation)), 5, 5);
+			super(x + (Math.cos(rotation)), y + (Math.sin(rotation)), 5, 5, rotation);
 			this.speed = 6;
-			this.rotation = rotation;
 		}
 		
 		move() {
@@ -254,10 +253,10 @@ $(document).ready(function() {
 	}
 
 	function drawHud() {
-		gameArea.drawText("Score: " + player.score, 10, 20);
-		gameArea.drawText("Lives: ", 10, 40);
+		gameArea.drawText("Score: " + player.score, 10, 20, 15);
+		gameArea.drawText("Lives: ", 10, 40, 15);
 		for (var i = 0; i < player.lives; i++) {
-			gameArea.drawText("*", 60 + (10*i), 40);
+			gameArea.drawText("*", 60 + (10*i), 40, 15);
 		}
 	}
 
