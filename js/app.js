@@ -1,5 +1,39 @@
 $(document).ready(() => {
 
+  const gameHeight = $(window).height() - 40;
+  const gameWidth = $(window).width() - 40;
+  const maxAsteroids = 10;
+  const maxBullets = 3;
+  // 87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 69 = e 80 = pause
+  const keyMap = {
+    87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69: false, 80: false,
+  };
+  const asteroids = [];
+  const bullets = [];
+  let asteroidImg;
+  let paused = false;
+  let playing = false;
+  let splashImg;
+  let player;
+
+  $(document).keydown((e) => {
+    if (e.keyCode in keyMap) {
+      keyMap[e.keyCode] = true;
+      if (paused && e.keyCode === 80) {
+        paused = false;
+      } else if (!paused && e.keyCode === 80) {
+        paused = true;
+      }
+      if (!playing && e.keyCode === 69) {
+        playing = true;
+      }
+    }
+  }).keyup((e) => {
+    if (e.keyCode in keyMap) {
+      keyMap[e.keyCode] = false;
+    }
+  });
+
   class GameArea {
     constructor() {
       this.update = this.update.bind(this);
@@ -84,17 +118,37 @@ $(document).ready(() => {
       }
     }
 
+    drawHud() {
+      gameArea.drawText(`Score: ${player.score}`, 10, 20, 15);
+      gameArea.drawText('Lives: ', 10, 40, 15);
+      for (let i = 0; i < player.lives; i++) {
+        gameArea.drawText('*', 60 + (10 * i), 40, 15);
+      }
+    }
+
+    startScreen() {
+      gameArea.clear();
+      gameArea.drawImg(gameWidth - 20, gameHeight, 0, 0, splashImg);
+      gameArea.drawText('Press E to play!', gameWidth / 2 - 40, (gameHeight / 2) + 60);
+    }
+
+    endScreen() {
+      gameArea.clear();
+      gameArea.drawText('Game Over!', gameWidth / 2 - 100, gameHeight / 2, 46);
+      gameArea.drawText(`Score: ${player.score}`, gameWidth / 2 - 50, gameHeight / 2 + 40, 24);
+    }
+
     update() {
       if (!playing) {
         if (player.lives < 0) {
-			    endScreen();
+			    this.endScreen();
         } else {
-			    startScreen();
+			    this.startScreen();
         }
       } else {
         this.clear();
         this.checkKeys();
-        drawHud();
+        this.drawHud();
         player.draw();
         if (asteroids.length > maxAsteroids) {
 			    asteroids.splice(0, maxAsteroids - asteroids.length);
@@ -134,40 +188,6 @@ $(document).ready(() => {
       }
 	  }
   }
-
-  const gameHeight = $(window).height() - 40;
-  const gameWidth = $(window).width() - 40;
-  const maxAsteroids = 10;
-  const maxBullets = 3;
-  // 87 & 38 = up, 68 & 39 = right, 65 & 40 = down, 83 & 37 = left, 71 = g, 69 = e 80 = pause
-  const keyMap = {
-    87: false, 38: false, 68: false, 39: false, 65: false, 40: false, 83: false, 37: false, 71: false, 69: false, 80: false,
-  };
-  const asteroids = [];
-  const bullets = [];
-  let asteroidImg;
-  let paused = false;
-  let playing = false;
-  let splashImg;
-  let player;
-
-  $(document).keydown((e) => {
-    if (e.keyCode in keyMap) {
-      keyMap[e.keyCode] = true;
-      if (paused && e.keyCode === 80) {
-        paused = false;
-      } else if (!paused && e.keyCode === 80) {
-        paused = true;
-      }
-      if (!playing && e.keyCode === 69) {
-        playing = true;
-      }
-    }
-  }).keyup((e) => {
-    if (e.keyCode in keyMap) {
-      keyMap[e.keyCode] = false;
-    }
-  });
 
   class GameObject {
     constructor(x, y, width, height, rotation) {
@@ -314,26 +334,6 @@ $(document).ready(() => {
       // Remove from bullets array
       bullets.splice(bullets.indexOf(this), 1);
     }
-  }
-
-  function drawHud() {
-    gameArea.drawText(`Score: ${player.score}`, 10, 20, 15);
-    gameArea.drawText('Lives: ', 10, 40, 15);
-    for (let i = 0; i < player.lives; i++) {
-      gameArea.drawText('*', 60 + (10 * i), 40, 15);
-    }
-  }
-
-  function startScreen() {
-    gameArea.clear();
-    gameArea.drawImg(gameWidth - 20, gameHeight, 0, 0, splashImg);
-    gameArea.drawText('Press E to play!', gameWidth / 2 - 40, (gameHeight / 2) + 60);
-  }
-
-  function endScreen() {
-    gameArea.clear();
-    gameArea.drawText('Game Over!', gameWidth / 2 - 100, gameHeight / 2, 46);
-    gameArea.drawText(`Score: ${player.score}`, gameWidth / 2 - 50, gameHeight / 2 + 40, 24);
   }
 
   let gameArea = new GameArea();
