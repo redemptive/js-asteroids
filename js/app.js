@@ -1,38 +1,40 @@
 $(document).ready(function() {
 
-	const gameArea = {
-		canvas : document.createElement("canvas"),
-		start : function () {
+	class GameArea {
+		constructor(){
+			this.canvas = document.createElement("canvas");
+		}
+		start() {
 			//Initiate the game area
 			this.canvas.width = gameWidth;
 			this.canvas.height = gameHeight;
 			this.context = this.canvas.getContext("2d");
 			document.body.insertBefore(this.canvas,document.body.childNodes[0]);
 			this.interval = setInterval(updateGameArea, 20);
-		},
-		clear : function () {
+		}
+		clear() {
 			//Clear the canvas to avoid drawing over the last frame
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 			this.draw(this.canvas.height,this.canvas.width,0,0,"black");
-		},
-		draw : function (height,width,x,y,color,rotation = 0) {
-			//Draw function with rotation if provided
+		}
+		draw(height,width,x,y,color,rotation) {
+			//Draw function with rotation
 			this.context.save();
 			this.context.fillStyle = color;
 			this.context.translate(x,y);
 			this.context.rotate(rotation);
 			this.context.fillRect(0, 0, width, height);
 			this.context.restore();
-		},
-		drawText : function (theString, x, y, size = 16) {
+		}
+		drawText(theString, x, y, size) {
 			//Draw function for text
 			this.context.save();
 			this.context.fillStyle = "white";
 			this.context.font = size + "px Verdana";
 			this.context.fillText(theString, x, y);
 			this.context.restore();
-		},
-		drawImg : function (width, height, x, y, image, rotation = 0) {
+		}
+		drawImg(width, height, x, y, image, rotation) {
 			//Draw an image with the given parameters
 			this.context.save();
 			if (rotation !== 0) {
@@ -44,7 +46,7 @@ $(document).ready(function() {
 			}
 			this.context.restore();
 		}
-	};
+	}
 
 	const gameHeight = $(window).height() - 20;
 	const gameWidth = $(window).width() - 20;
@@ -93,9 +95,6 @@ $(document).ready(function() {
 		}
 		draw() {
 			gameArea.drawImg(this.width, this.height, this.x, this.y, this.img[this.lives], this.rotation);
-		}
-		init() {
-			this.img.src = "assets/player.png";
 		}
 		fire() {
 			bullets.push(new bullet(this.x,this.y + (this.height/2),this.rotation));
@@ -202,7 +201,6 @@ $(document).ready(function() {
 
 	function initGame() {
 		player = new Player();
-		player.init();
 		player.img[0] = new Image();
 		player.img[0].src = "assets/playerDam2.png";
 		player.img[1] = new Image();
@@ -213,16 +211,17 @@ $(document).ready(function() {
 		asteroidImg.src = "assets/asteroid.png";
 		splashImg = new Image();
 		splashImg.src = "assets/splash.png";
-		for (var i = 0; i < maxAsteroids; i++) {
+		for (let i = 0; i < maxAsteroids; i++) {
 			asteroids[i] = new asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
 		}
 	}
 
 	function collission(x1,y1,w1,h1,x2,y2,w2,h2) {
-		var r1 = w1 + x1;
-		var b1 = h1 + y1;
-		var r2 = w2 + x2;
-		var b2 = h2 + y2;
+		// Standard bounding box collission detection
+		let r1 = w1 + x1;
+		let b1 = h1 + y1;
+		let r2 = w2 + x2;
+		let b2 = h2 + y2;
 						
 		if (x1 < r2 && r1 > x2 && y1 < b2 && b1 > y2) {
 			return true;
@@ -327,6 +326,7 @@ $(document).ready(function() {
 		}
 	}
 
+	let gameArea = new GameArea();
 	gameArea.start();
 	initGame();
 
