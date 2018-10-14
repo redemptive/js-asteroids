@@ -58,6 +58,7 @@ $(document).ready(function() {
 	let paused = false;
 	let playing = false;
 	let splashImg;
+	let player;
 	
 	$(document).keydown(function(e) {
 		if (e.keyCode in keyMap) {
@@ -77,24 +78,26 @@ $(document).ready(function() {
 		}
 	});
 
-	var player = {
-		x: gameWidth / 2,
-		y: gameHeight / 2,
-		height: 50,
-		width: 50,
-		score: 0,
-		speed: 4,
-		maxSpeed: 3,
-		rotation: 0,
-		img: [],
-		lives: 2,
-		draw: function() {
+	class Player {
+		constructor() {
+			this.x = gameWidth / 2;
+			this.y = gameHeight / 2;
+			this.height = 50;
+			this.width = 50;
+			this.score = 0;
+			this.speed = 4;
+			this.maxSpeed = 3;
+			this.rotation = 0;
+			this.img = [];
+			this.lives = 2;
+		}
+		draw() {
 			gameArea.drawImg(this.width, this.height, this.x, this.y, this.img[this.lives], this.rotation);
-		},
-		init: function() {
+		}
+		init() {
 			this.img.src = "assets/player.png";
-		},
-		fire: function() {
+		}
+		fire() {
 			bullets.push(new bullet(this.x,this.y + (this.height/2),this.rotation));
 		}
 	}
@@ -198,6 +201,7 @@ $(document).ready(function() {
 	}
 
 	function initGame() {
+		player = new Player();
 		player.init();
 		player.img[0] = new Image();
 		player.img[0].src = "assets/playerDam2.png";
