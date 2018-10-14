@@ -1,0 +1,24 @@
+{
+  "name": "js-asteroids",
+  "version": "1.0.0",
+  "description": "An asteroids game in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redemptive/js-asteroids.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/redemptive/js-asteroids/issues"
+  },
+  "homepage": "https://github.com/redemptive/js-asteroids#readme",
+  "devDependencies": {
+    "eslint": "^5.7.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  }
+}
