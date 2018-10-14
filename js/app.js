@@ -3,9 +3,6 @@ $(document).ready(function() {
 	class GameArea {
 		constructor(){
 			this.canvas = document.createElement("canvas");
-		}
-		start() {
-			//Initiate the game area
 			this.canvas.width = gameWidth;
 			this.canvas.height = gameHeight;
 			this.context = this.canvas.getContext("2d");
@@ -80,18 +77,30 @@ $(document).ready(function() {
 		}
 	});
 
-	class Player {
+	class GameObject {
+		constructor(x, y, width, height) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+		}
+	}
+
+	class Player extends GameObject {
 		constructor() {
-			this.x = gameWidth / 2;
-			this.y = gameHeight / 2;
-			this.height = 50;
-			this.width = 50;
+			super(gameWidth / 2, gameHeight / 2, 50, 50);
 			this.score = 0;
 			this.speed = 4;
 			this.maxSpeed = 3;
 			this.rotation = 0;
 			this.img = [];
 			this.lives = 2;
+			this.img[0] = new Image();
+			this.img[0].src = "assets/playerDam2.png";
+			this.img[1] = new Image();
+			this.img[1].src = "assets/playerDam1.png";
+			this.img[2] = new Image();
+			this.img[2].src = "assets/player.png";
 		}
 		draw() {
 			gameArea.drawImg(this.width, this.height, this.x, this.y, this.img[this.lives], this.rotation);
@@ -101,13 +110,10 @@ $(document).ready(function() {
 		}
 	}
 
-	class asteroid {
+	class asteroid extends GameObject {
 		constructor (x, y, xSpeed, ySpeed, height, width, collided = false) {
-			this.x = x;
-			this.y = y;
+			super(x, y, width, height);
 			this.collided = collided;
-			this.height = height;
-			this.width = width;
 			this.xSpeed = xSpeed;
 			this.ySpeed = ySpeed;
 		}
@@ -172,12 +178,10 @@ $(document).ready(function() {
 		}
 	}
 
-	class bullet {
+	class bullet extends GameObject{
 		constructor (x, y, rotation) {
 			//Add an amount to x and y so the bullet doesn't hit the shooter
-			this.x = x + (Math.cos(rotation));
-			this.y = y + (Math.sin(rotation));
-			this.size = 5;
+			super(x + (Math.cos(rotation)), y + (Math.sin(rotation)), 5, 5);
 			this.speed = 6;
 			this.rotation = rotation;
 		}
@@ -191,7 +195,7 @@ $(document).ready(function() {
 			}
 		}
 		draw() {
-			gameArea.draw(this.size,this.size,this.x,this.y,"red",this.rotation);
+			gameArea.draw(this.height,this.width,this.x,this.y,"red",this.rotation);
 		}
 		die() {
 			//Remove from bullets array
@@ -201,12 +205,6 @@ $(document).ready(function() {
 
 	function initGame() {
 		player = new Player();
-		player.img[0] = new Image();
-		player.img[0].src = "assets/playerDam2.png";
-		player.img[1] = new Image();
-		player.img[1].src = "assets/playerDam1.png";
-		player.img[2] = new Image();
-		player.img[2].src = "assets/player.png";
 		asteroidImg = new Image();
 		asteroidImg.src = "assets/asteroid.png";
 		splashImg = new Image();
@@ -299,7 +297,7 @@ $(document).ready(function() {
 			}
 			for (var i = 0; i < asteroids.length; i++) {
 				for (var j = 0; j < bullets.length; j++) {
-					if (collission(bullets[j].x, bullets[j].y, bullets[j].size, bullets[j].size, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
+					if (collission(bullets[j].x, bullets[j].y, bullets[j].width, bullets[j].height, asteroids[i].x, asteroids[i].y, asteroids[i].width, asteroids[i].height)) {
 						player.score++;
 						bullets[j].die();
 						asteroids[i].split();
@@ -327,7 +325,6 @@ $(document).ready(function() {
 	}
 
 	let gameArea = new GameArea();
-	gameArea.start();
 	initGame();
 
 });
