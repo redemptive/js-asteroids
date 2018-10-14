@@ -170,26 +170,28 @@ $(document).ready(function() {
 		}
 	}
 
-	function bullet(x, y, rotation) {
-		//Add an amount to x and y so the bullet doesn't hit the shooter
-		this.x = x + (Math.cos(rotation));
-		this.y = y + (Math.sin(rotation));
-		this.size = 5;
-		this.speed = 6;
-		this.rotation = rotation;
+	class bullet {
+		constructor (x, y, rotation) {
+			//Add an amount to x and y so the bullet doesn't hit the shooter
+			this.x = x + (Math.cos(rotation));
+			this.y = y + (Math.sin(rotation));
+			this.size = 5;
+			this.speed = 6;
+			this.rotation = rotation;
+		}
 		
-		this.move = function() {
+		move() {
 			//Keep bullet going at the same speed on a diagonal path
 			this.x -= this.speed * Math.cos(this.rotation);
 			this.y -= this.speed * Math.sin(this.rotation);
 			if (this.x > gameWidth || this.x < 0 || this.y > gameHeight || this.y < 0) {
 				this.die();
 			}
-		},
-		this.draw = function() {
+		}
+		draw() {
 			gameArea.draw(this.size,this.size,this.x,this.y,"red",this.rotation);
-		},
-		this.die = function() {
+		}
+		die() {
 			//Remove from bullets array
 			bullets.splice(bullets.indexOf(this),1);
 		}
