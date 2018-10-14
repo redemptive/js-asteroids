@@ -1,12 +1,24 @@
 $(document).ready(() => {
+
   class GameArea {
     constructor() {
+      this.update = this.update.bind(this);
+      this.clear = this.clear.bind(this);
       this.canvas = document.createElement('canvas');
       this.canvas.width = gameWidth;
       this.canvas.height = gameHeight;
       this.context = this.canvas.getContext('2d');
       document.body.insertBefore(this.canvas, document.body.childNodes[0]);
       this.interval = setInterval(this.update, 20);
+
+      player = new Player();
+      asteroidImg = new Image();
+      asteroidImg.src = 'assets/asteroid.png';
+      splashImg = new Image();
+      splashImg.src = 'assets/splash.png';
+      for (let i = 0; i < maxAsteroids; i++) {
+        asteroids[i] = new Asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
+      }
     }
 
     clear() {
@@ -47,16 +59,41 @@ $(document).ready(() => {
       this.context.restore();
     }
 
+    checkKeys() {
+      // up
+      if ((keyMap[87] || keyMap[38]) && player.x - player.speed * Math.cos(player.rotation) > 0 && player.x - player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y - player.speed * Math.sin(player.rotation) > 0 && player.y - player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
+        player.x -= player.speed * Math.cos(player.rotation);
+        player.y -= player.speed * Math.sin(player.rotation);
+      }
+      // Right
+      if (keyMap[68] || keyMap[39]) {
+        player.rotation += 0.1;
+      }
+      // Left
+      if (keyMap[65] || keyMap[40]) {
+        player.rotation -= 0.1;
+      }
+      // Down
+      if ((keyMap[83] || keyMap[37]) && player.x + player.speed * Math.cos(player.rotation) > 0 && player.x + player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y + player.speed * Math.sin(player.rotation) > 0 && player.y + player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
+        player.x += player.speed * Math.cos(player.rotation);
+        player.y += player.speed * Math.sin(player.rotation);
+      }
+      // G
+      if (keyMap[71] && bullets.length < maxBullets) {
+        player.fire();
+      }
+    }
+
     update() {
       if (!playing) {
         if (player.lives < 0) {
-			  endScreen();
+			    endScreen();
         } else {
-			  startScreen();
+			    startScreen();
         }
       } else {
-        gameArea.clear();
-        checkKeys();
+        this.clear();
+        this.checkKeys();
         drawHud();
         player.draw();
         if (asteroids.length > maxAsteroids) {
@@ -143,13 +180,13 @@ $(document).ready(() => {
 
     collission(gameObject) {
       // Standard bounding box collission detection
-      const r1 = this.width + this.x;
-      const b1 = this.height + this.y;
-      const r2 = gameObject.width + gameObject.x;
-      const b2 = gameObject.height + gameObject.y;
+      let r1 = this.width + this.x;
+      let b1 = this.height + this.y;
+      let r2 = gameObject.width + gameObject.x;
+      let b2 = gameObject.height + gameObject.y;
 
       if (this.x < r2 && r1 > gameObject.x && this.y < b2 && b1 > gameObject.y) {
-		  return true;
+		    return true;
       }
       return false;
 	  }
@@ -279,42 +316,6 @@ $(document).ready(() => {
     }
   }
 
-  function initGame() {
-    player = new Player();
-    asteroidImg = new Image();
-    asteroidImg.src = 'assets/asteroid.png';
-    splashImg = new Image();
-    splashImg.src = 'assets/splash.png';
-    for (let i = 0; i < maxAsteroids; i++) {
-      asteroids[i] = new Asteroid(Math.floor(Math.random() * gameWidth), Math.floor(Math.random() * gameHeight), Math.floor(Math.random() * 6) - 3, Math.floor(Math.random() * 6) - 3, 50, 50);
-    }
-  }
-
-  function checkKeys() {
-    // up
-    if ((keyMap[87] || keyMap[38]) && player.x - player.speed * Math.cos(player.rotation) > 0 && player.x - player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y - player.speed * Math.sin(player.rotation) > 0 && player.y - player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
-      player.x -= player.speed * Math.cos(player.rotation);
-      player.y -= player.speed * Math.sin(player.rotation);
-    }
-    // Right
-    if (keyMap[68] || keyMap[39]) {
-      player.rotation += 0.1;
-    }
-    // Left
-    if (keyMap[65] || keyMap[40]) {
-      player.rotation -= 0.1;
-    }
-    // Down
-    if ((keyMap[83] || keyMap[37]) && player.x + player.speed * Math.cos(player.rotation) > 0 && player.x + player.speed * Math.cos(player.rotation) < gameWidth - player.width && player.y + player.speed * Math.sin(player.rotation) > 0 && player.y + player.speed * Math.sin(player.rotation) < gameHeight - player.height) {
-      player.x += player.speed * Math.cos(player.rotation);
-      player.y += player.speed * Math.sin(player.rotation);
-    }
-    // G
-    if (keyMap[71] && bullets.length < maxBullets) {
-      player.fire();
-    }
-  }
-
   function drawHud() {
     gameArea.drawText(`Score: ${player.score}`, 10, 20, 15);
     gameArea.drawText('Lives: ', 10, 40, 15);
@@ -336,5 +337,5 @@ $(document).ready(() => {
   }
 
   let gameArea = new GameArea();
-  initGame();
+
 });
